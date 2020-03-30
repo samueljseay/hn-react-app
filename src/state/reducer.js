@@ -1,30 +1,25 @@
+import { useReducer } from "react";
+import { thunkMiddleware } from "../middleware/thunk";
+
 export const ADD_STORY = "ADD_STORY";
 export const ADD_STORY_IDS = "ADD_STORY_IDS";
 
 export const storyReducer = (state, action) => {
   switch (action.type) {
-    case "ADD_STORY_IDS":
+    case ADD_STORY_IDS:
       return {
         ...state,
-        stories: action.val.map(id => ({
-          id,
-          detail: null
-        }))
+        storyIds: action.val
       };
-    case "ADD_STORY":
-      return {
-        ...state,
-        stories: state.stories.map(s => {
-          if (s.id === action.val.id) {
-            return {
-              id: s.id,
-              detail: action.val
-            };
-          } else {
-            return s;
-          }
-        })
-      };
+    case ADD_STORY:
+      if (action.val.url) {
+        return {
+          ...state,
+          stories: [...state.stories, { detail: action.val }]
+        };
+      } else {
+        return state;
+      }
     default:
       return state;
   }
@@ -32,5 +27,13 @@ export const storyReducer = (state, action) => {
 
 export const initialState = {
   storyIds: [],
-  stories: []
+  stories: [],
+  pauseLoading: false
+};
+
+export const createReducer = (reducer, initialState) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  // apply thunk middleware
+  return [state, thunkMiddleware(dispatch, state)];
 };

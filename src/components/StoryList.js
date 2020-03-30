@@ -6,7 +6,7 @@ export const StoryList = ({ stories }) => {
     <Fragment>
       <h1>Hacker News Story List</h1>
       {stories.map(s => (
-        <Story key={s.id} title={s.detail.title} url={s.detail.url} />
+        <Story key={s.detail.id} detail={s.detail} />
       ))}
     </Fragment>
   );

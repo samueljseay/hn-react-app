@@ -1,30 +1,54 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useRef, Fragment } from "react";
 import { StoryList } from "./StoryList";
-import { fetchLatestStoryIds, fetchStoryById } from "../services/hn";
+import { storyReducer, initialState, createReducer } from "../state/reducer";
 import {
-  storyReducer,
-  ADD_STORY_IDS,
-  initialState,
-  ADD_STORY
-} from "../state/reducer";
+  fetchStoryIds,
+  pauseQueue,
+  unpauseQueue
+} from "../thunks/fetchStoryIds";
 
 export const App = () => {
-  const [state, dispatch] = useReducer(storyReducer, initialState);
+  const [state, dispatch] = createReducer(storyReducer, initialState);
+  const anchorRef = useRef(null);
 
   useEffect(() => {
-    const fetchAndUpdate = async () => {
-      const ids = await fetchLatestStoryIds();
-
-      dispatch({ type: ADD_STORY_IDS, val: ids });
-
-      for (let i = 0; i < ids.length; i++) {
-        const s = await fetchStoryById(ids[i]);
-        dispatch({ type: ADD_STORY, val: s });
-      }
-    };
-
-    fetchAndUpdate();
+    dispatch(fetchStoryIds());
   }, []);
 
-  return <StoryList stories={state.stories.filter(s => s.detail !== null)} />;
+  useEffect(() => {
+    const startLoadingOpts = {
+      root: null,
+      rootMargin: "0px",
+      threshold: [0, 1]
+    };
+
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) {
+          dispatch(pauseQueue());
+        } else {
+          dispatch(unpauseQueue());
+        }
+      });
+    }, startLoadingOpts);
+
+    if (anchorRef.current) {
+      observer.observe(anchorRef.current);
+    }
+
+    return () => {
+      observer.unobserve(anchorRef.current);
+    };
+  }, []);
+
+  return (
+    <Fragment>
+      <StoryList stories={state.stories} />
+      <div
+        ref={anchorRef}
+        id="bottom-anchor"
+        style={{ height: "150px", width: "100%", paddingBottom: "20px" }}
+      />
+    </Fragment>
+  );
 };
