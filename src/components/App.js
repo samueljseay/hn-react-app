@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, Fragment } from "react";
 import { StoryList } from "./StoryList";
-import { storyReducer, initialState, createReducer } from "../state/reducer";
+import { storyReducer, createReducer } from "../state/reducer";
 import {
   fetchStoryIds,
   pauseQueue,
   unpauseQueue
-} from "../thunks/fetchStoryIds";
+} from "../thunks/fetch-story-ids";
+import { Error } from "./Error";
 
 export const App = () => {
-  const [state, dispatch] = createReducer(storyReducer, initialState);
+  const [state, dispatch] = createReducer(storyReducer);
   const anchorRef = useRef(null);
 
   useEffect(() => {
@@ -43,6 +44,8 @@ export const App = () => {
 
   return (
     <Fragment>
+      <h1>Hacker News Story List</h1>
+      {state.error && <Error message={state.error} />}
       <StoryList stories={state.stories} />
       <div
         ref={anchorRef}

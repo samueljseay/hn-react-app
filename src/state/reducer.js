@@ -3,9 +3,15 @@ import { thunkMiddleware } from "../middleware/thunk";
 
 export const ADD_STORY = "ADD_STORY";
 export const ADD_STORY_IDS = "ADD_STORY_IDS";
+export const RETRIEVAL_ERROR = "RETRIEVAL_ERROR";
 
 export const storyReducer = (state, action) => {
   switch (action.type) {
+    case RETRIEVAL_ERROR:
+      return {
+        ...state,
+        error: action.val
+      };
     case ADD_STORY_IDS:
       return {
         ...state,
@@ -25,13 +31,14 @@ export const storyReducer = (state, action) => {
   }
 };
 
-export const initialState = {
+const initialState = {
   storyIds: [],
   stories: [],
-  pauseLoading: false
+  pauseLoading: false,
+  error: null
 };
 
-export const createReducer = (reducer, initialState) => {
+export const createReducer = reducer => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   // apply thunk middleware
