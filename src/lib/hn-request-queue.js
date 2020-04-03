@@ -8,6 +8,7 @@ export class HNRequestQueue {
     this.paused = false;
     this.hasRegisteredServiceWorker = false;
     this.itemsProcessed = 0;
+    this.nextPause = null;
   }
 
   start(list, dispatch) {
@@ -25,7 +26,12 @@ export class HNRequestQueue {
 
         this.dispatch({ type: ADD_STORY, val: story, id: story.id });
         this.itemsProcessed++;
-        this.handle = this.queueNextJob();
+
+        if (this.nextPause && this.itemsProcessed >= this.nextPause) {
+          this.paused = true;
+        } else {
+          this.handle = this.queueNextJob();
+        }
       } catch (error) {
         this.dispatch({ type: RETRIEVAL_ERROR, val: error });
       }
@@ -55,9 +61,10 @@ export class HNRequestQueue {
   }
 
   pause() {
-    if (!this.paused && this.handle) {
-      this.paused = true;
-      window.cancelIdleCallback(this.handle);
+    // Rather than pause immediately we load a few extra items as overflow
+    // for better scrolling, then pause.
+    if (!this.paused) {
+      this.nextPause = this.itemsProcessed + 5;
     }
 
     if (!this.hasRegisteredServiceWorker) {
@@ -69,6 +76,7 @@ export class HNRequestQueue {
   unpause() {
     if (this.paused) {
       this.paused = false;
+      this.nextPause = null;
       this.handle = this.queueNextJob();
     }
   }
