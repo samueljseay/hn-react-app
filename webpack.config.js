@@ -1,6 +1,11 @@
 var path = require("path");
 
 module.exports = {
+  entry: {
+    main: "./src/index.js",
+    sw: "./src/lib/service-worker.js"
+  },
+
   module: {
     rules: [
       {
@@ -14,6 +19,11 @@ module.exports = {
         }
       }
     ]
+  },
+
+  output: {
+    filename: "[name].js",
+    path: __dirname + "/dist"
   },
 
   devServer: {

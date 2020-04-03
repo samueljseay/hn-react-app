@@ -1,12 +1,12 @@
-import { fetchStoryById } from "../services/hn";
-import { ADD_STORY } from "../state/reducer";
+import { fetchStoryById } from "../services/hn-service";
+import { ADD_STORY, RETRIEVAL_ERROR } from "../state/reducer";
 
 // To take load off the browser when fetching stories, this class utilises requestIdleCallback to load stories
 // one by one in a more performant manner.
 export class HNRequestQueue {
   constructor() {
-    this.started = false;
     this.paused = false;
+    this.hasRegisteredServiceWorker = false;
     this.itemsProcessed = 0;
   }
 
@@ -14,18 +14,21 @@ export class HNRequestQueue {
     this.list = list.slice();
     this.dispatch = dispatch;
     this.handle = this.queueNextJob();
-    this.started = true;
   }
 
-  processQueue() {
+  async processQueue() {
     const nextFetch = this.fetchNextStory();
 
     if (nextFetch) {
-      nextFetch.then(story => {
-        this.itemsProcessed++;
+      try {
+        const story = await this.fetchNextStory();
+
         this.dispatch({ type: ADD_STORY, val: story, id: story.id });
+        this.itemsProcessed++;
         this.handle = this.queueNextJob();
-      });
+      } catch (error) {
+        this.dispatch({ type: RETRIEVAL_ERROR, val: error });
+      }
     }
   }
 
@@ -56,6 +59,11 @@ export class HNRequestQueue {
       this.paused = true;
       window.cancelIdleCallback(this.handle);
     }
+
+    if (!this.hasRegisteredServiceWorker) {
+      this.registerServiceWorker();
+      this.hasRegisteredServiceWorker = true;
+    }
   }
 
   unpause() {
@@ -63,5 +71,9 @@ export class HNRequestQueue {
       this.paused = false;
       this.handle = this.queueNextJob();
     }
+  }
+
+  registerServiceWorker() {
+    navigator.serviceWorker.register("sw.js");
   }
 }
