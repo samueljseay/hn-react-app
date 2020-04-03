@@ -36,8 +36,10 @@ export const fetchStoryById = async storyId => {
     } else {
       const story = await response.json();
 
-      // Always overwrite the story with the latest retrieved one
-      saveStoryInCache(story);
+      window.requestIdleCallback(() => {
+        // Always overwrite the story with the latest retrieved one
+        saveStoryInCache(story);
+      });
 
       return story;
     }

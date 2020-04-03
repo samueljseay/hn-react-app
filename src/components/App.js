@@ -6,7 +6,6 @@ import {
   pauseQueue,
   unpauseQueue
 } from "../thunks/fetch-story-ids";
-import { Error } from "./Error";
 
 export const App = () => {
   const [state, dispatch] = createReducer(storyReducer);
@@ -20,7 +19,7 @@ export const App = () => {
     const startLoadingOpts = {
       root: null,
       rootMargin: "0px",
-      threshold: [0, 1]
+      threshold: 0
     };
 
     const observer = new IntersectionObserver(entries => {
@@ -44,13 +43,11 @@ export const App = () => {
 
   return (
     <Fragment>
-      <h1>Hacker News Story List</h1>
-      {state.error && <Error message={state.error} />}
-      <StoryList stories={state.stories} />
+      <StoryList error={state.error} stories={state.stories} />
       <div
         ref={anchorRef}
         id="bottom-anchor"
-        style={{ height: "150px", width: "100%", paddingBottom: "20px" }}
+        style={{ height: "100px", width: "100%" }}
       />
     </Fragment>
   );
