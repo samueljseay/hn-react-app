@@ -31,7 +31,7 @@ export const storyReducer = (state, action) => {
   }
 };
 
-const initialState = {
+export const initialState = {
   storyIds: [],
   stories: [],
   pauseLoading: false,

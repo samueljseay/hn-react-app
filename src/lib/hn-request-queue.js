@@ -22,7 +22,7 @@ export class HNRequestQueue {
 
     if (nextFetch) {
       try {
-        const story = await this.fetchNextStory();
+        const story = await nextFetch;
 
         this.dispatch({ type: ADD_STORY, val: story, id: story.id });
         this.itemsProcessed++;
@@ -68,6 +68,9 @@ export class HNRequestQueue {
     }
 
     if (!this.hasRegisteredServiceWorker) {
+      // The perf recommendations are to register service workers as late as possible.
+      // This waits till the first time the queue is paused. This ensures the worker
+      // does not try to register during the first fetch of stories.
       this.registerServiceWorker();
       this.hasRegisteredServiceWorker = true;
     }

@@ -2,7 +2,7 @@ import { fetchLatestStoryIds } from "../services/hn-service";
 import { ADD_STORY_IDS, RETRIEVAL_ERROR } from "../state/reducer";
 import { HNRequestQueue } from "../lib/hn-request-queue";
 
-const queue = new HNRequestQueue();
+export const queue = new HNRequestQueue();
 
 export const fetchStoryIds = () => {
   return async dispatch => {

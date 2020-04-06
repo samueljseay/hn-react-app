@@ -2,6 +2,7 @@ import React from "react";
 
 export const Story = ({ detail }) => {
   const postedDate = new Date(detail.time * 1000);
+  const formattedDate = postedDate.toLocaleString("en-US");
 
   return (
     <article
@@ -16,10 +17,11 @@ export const Story = ({ detail }) => {
         Author: {detail.by}
       </p>
       <time
-        aria-label={`Published on ${postedDate.toLocaleString("en-US")}`}
+        data-testid={"story-time"}
+        aria-label={`Published on ${formattedDate}`}
         dateTime={postedDate.toISOString()}
       >
-        Date: {postedDate.toLocaleString("en-US")}
+        Date: {formattedDate}
       </time>
     </article>
   );

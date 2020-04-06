@@ -18,7 +18,9 @@ export const fetchLatestStoryIds = async () => {
     const cachedList = getStoryListFromCache();
 
     if (!cachedList) {
-      throw "Network is offline and there are no cached stories, sorry!";
+      throw new Error(
+        "Network is offline and there are no cached stories, sorry!"
+      );
     } else {
       return cachedList;
     }

@@ -7,11 +7,9 @@ export const StoryList = ({ stories, error }) => {
     <Fragment>
       <h1>Hacker News Story List</h1>
       {error && <Error message={error} />}
-      <div>
-        {stories.map(s => (
-          <Story key={s.detail.id} detail={s.detail} />
-        ))}
-      </div>
+      {stories.map(s => (
+        <Story key={s.detail.id} detail={s.detail} />
+      ))}
     </Fragment>
   );
 };
