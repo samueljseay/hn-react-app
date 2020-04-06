@@ -27,3 +27,7 @@ Known limitations:
 - There is only cursory styling applied at the moment, it didn't appear to be an important
   part of this exercise. I've applied temporary styles in React mostly just to make the content
   readable.
+
+- For the offline implementation, I realised later that I could have used IndexedDB to cache
+  the stories and that would have made the caching implementation cleaner than it is. I didn't
+  change it due to time constraints.
