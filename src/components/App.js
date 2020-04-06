@@ -15,7 +15,22 @@ export const App = () => {
     dispatch(fetchStoryIds());
   }, []);
 
-  useEffect(() => {
+  useEffect(createIntersectionObserver(dispatch, anchorRef), [anchorRef]);
+
+  return (
+    <Fragment>
+      <StoryList error={state.error} stories={state.stories} />
+      <div
+        ref={anchorRef}
+        data-testid="bottom-anchor"
+        style={{ height: "100px", width: "100%" }}
+      />
+    </Fragment>
+  );
+};
+
+export const createIntersectionObserver = (dispatch, anchorRef) => {
+  return () => {
     const startLoadingOpts = {
       root: null,
       rootMargin: "0px",
@@ -39,16 +54,5 @@ export const App = () => {
     return () => {
       observer.unobserve(anchorRef.current);
     };
-  }, []);
-
-  return (
-    <Fragment>
-      <StoryList error={state.error} stories={state.stories} />
-      <div
-        ref={anchorRef}
-        id="bottom-anchor"
-        style={{ height: "100px", width: "100%" }}
-      />
-    </Fragment>
-  );
+  };
 };
